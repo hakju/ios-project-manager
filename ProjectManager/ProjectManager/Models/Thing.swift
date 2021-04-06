@@ -38,7 +38,7 @@ extension Thing: Hashable {
 }
 
 extension Thing: Equatable {
-    static func ==(lhs: Thing, rhs: Thing) -> Bool {
+    static func == (lhs: Thing, rhs: Thing) -> Bool {
         return lhs.id == rhs.id
     }
 }

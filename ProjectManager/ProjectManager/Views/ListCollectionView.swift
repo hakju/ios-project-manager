@@ -1,14 +1,17 @@
 import UIKit
 
 class ListCollectionView: UICollectionView {
+    
+    let mainViewController = ViewController()
+    
     enum Section {
         case main
     }
     
     var collectionType: State
     
-    lazy var diffableDataSource: UICollectionViewDiffableDataSource<Section, Int> = {
-        return UICollectionViewDiffableDataSource<Section, Int>(collectionView: self) { (collectionView, indexPath, number) -> UICollectionViewCell? in
+    lazy var diffableDataSource: UICollectionViewDiffableDataSource<Section, Thing> = {
+        return UICollectionViewDiffableDataSource<Section, Thing>(collectionView: self) { (collectionView, indexPath, Thing) -> UICollectionViewCell? in
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCell.identifier, for: indexPath) as? ItemCell else {
                 return UICollectionViewCell()
             }
@@ -52,9 +55,20 @@ class ListCollectionView: UICollectionView {
     }
     
     func configureDataSource() {
-        var initialSnapShot = NSDiffableDataSourceSnapshot<Section, Int>()
+//        let thing = AddTodoViewController.updateDataSource.first
+//        guard let updateTitle = things?.title else { return }
+//        guard let updateDescription = things?.description else { return }
+//        guard (things?.state) != nil else { return }
+//        guard let updateDueDate = things?.dueDate else { return }
+        
+//        var initialSnapShot = NSDiffableDataSourceSnapshot<Section, Thing>()
+//        initialSnapShot.appendSections([.main])
+//        initialSnapShot.appendItems([.init(title: updateTitle, description: updateDescription, state: .todo, dueDate: updateDueDate)], toSection: .main)
+        
+        let things = AddTodoViewController.updateDataSource
+        var initialSnapShot = NSDiffableDataSourceSnapshot<Section, Thing>()
         initialSnapShot.appendSections([.main])
-        initialSnapShot.appendItems(Array(1...7))
+        initialSnapShot.appendItems(things)
         
         diffableDataSource.supplementaryViewProvider = { (collectionView: UICollectionView, kind: String, indexPath: IndexPath) -> UICollectionReusableView? in
             guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.reuseIdentifier, for: indexPath) as? HeaderView else {
@@ -65,5 +79,8 @@ class ListCollectionView: UICollectionView {
         }
 
         diffableDataSource.apply(initialSnapShot, animatingDifferences: false)
+        
+        //1. reloadData를 해주는 위치가 잘못되었는지
+        //2. diffableDataSource는 snapShot으로 비교하기 때문에 reloadData가 필요없는건지
     }
 }

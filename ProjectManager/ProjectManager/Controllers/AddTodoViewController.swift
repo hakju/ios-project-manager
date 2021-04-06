@@ -2,6 +2,8 @@ import UIKit
 
 class AddTodoViewController: UIViewController {
     
+    static var updateDataSource: [Thing] = []
+    
     let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -67,7 +69,13 @@ class AddTodoViewController: UIViewController {
     }
     
     @objc private func didTappedDoneButton() {
-        
+        guard let title = textField.text else { return }
+        guard let description = textView.text else { return }
+        let dueDate = datePicker.date.timeIntervalSince1970
+        let thing = Thing(title: title, description: description, state: .todo, dueDate: dueDate)
+        AddTodoViewController.updateDataSource.append(thing)
+        print(AddTodoViewController.updateDataSource)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc private func didTappedCancelButton() {
