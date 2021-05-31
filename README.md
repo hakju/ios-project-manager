@@ -1,119 +1,51 @@
-## 팀원
+# 👨🏻‍💼 프로젝트 매니저 👨🏻‍💼
+- 소개: 칸반보드 형식의 프로젝트를 관리해주는 아이패드 전용 앱이다.
+- 기간: 2021. 03. 29 ~ 2021. 04. 18
+- 팀원: [꼬말](https://github.com/hakju), [글렌](https://github.com/Journey36), [준스](https://github.com/elddy0948)
 
-|                 팀원                  |                          사용 언어                           |
-| :-----------------------------------: | :----------------------------------------------------------: |
-| [Joons](https://github.com/elddy0948) | <img width="200" alt="Swift" src="https://user-images.githubusercontent.com/40102795/114259983-f7a4f480-9a0c-11eb-8f57-2da635febfd9.png"> |
-|  [Glenn](https://github.com/iluxsm)   | <img width="200" alt="Swift" src="https://user-images.githubusercontent.com/40102795/114259983-f7a4f480-9a0c-11eb-8f57-2da635febfd9.png"> |
-|   [꼬말](https://github.com/hakju)    | <img width="200" alt="Swift" src="https://user-images.githubusercontent.com/40102795/114259983-f7a4f480-9a0c-11eb-8f57-2da635febfd9.png"> |
+## 팀 프로젝트 그라운드 룰
+- 팀원 : 글렌, 꼬말, 준스
+- 기간 : 2021. 03. 29 ~ 2021. 04. 18
 
+- 우리 팀만의 규칙
+  - 디스코드에 있을 때는 언제든지 편하게 연락
+  - github에서 project, issue, milestone, dicussions 적극활용해서 프로젝트 진행하기
 
+- 스크럼
+  - 스크럼 시간은 오전 11시 (월, 화, 목, 금)
+  - 나눌 내용
+  - 컨디션 공유
+  - 어제 공부한 내용 공유
+  - 오늘 할 일 공유
+  - 프로젝트 진행사항 공유
 
-## 사용한 기술
+- 프로젝트
+  - Commit
+  - 커밋단위 : 빌드되는 상태에서, 기능단위로 커밋하기.
+  - Type 규칙 (커밋 메세지에 이슈 번호를 추가하면 해당 이슈로 commit이 넘어감)
+  - 예시 → Type종류 #이슈번호 - commit 내용
+  - Feat: 기능 구현
+  - Refactor: 기능 수정
+  - Fix: 버그 수정
+  - Style: 동작에 영향없는 코드변경, 이름변경
+  - Docs: 문서수정
+  - Chore: 기타
+  - 코딩 컨벤션
+  - Swift API 디자인 가이드라인을 준수하기
+  - naming에 신경쓰기.
+  - 의미없는 띄어쓰기 안하도록 주의하기.
+  - 기능 분리 잘 되도록 주의하기. (1 함수 1 기능 지향) 
+---
+ 
+## 📱 앱 동작화면 📱
+ 
+ 
+---
 
-- UICollectionView
-- UICollectionViewDiffableDataSource
-- UICollectionViewDragDelegate, UICollectionViewDropDelegate
+## 👨🏻‍💻 구현 내용 👨🏻‍💻
+- 
 
+---
 
-
-
-
-## Refactor
-
-- 기존에 PopOverViewController의 View들을 Private으로 설정해줄 수 없었다. -> ViewController에서 접근하고 있었기때문이다. 그래서 ViewController에서는 PopOverViewController에 사용할 Thing만 넘겨주고, 그 Thing의 유무에 따라 Add를 위한 PopOverViewController인지 Edit를 위한 PopOverViewController인지 결정해주었습니다.
-
-  - ```swift
-        init(collectionView: ListCollectionView, thing: Thing?) {
-            super.init(nibName: nil, bundle: nil)
-            self.collectionView = collectionView
-            
-            if let thing = thing {
-                configureEdit(with: thing)
-            } else {
-                configureAdd()
-            }
-        }
-    ```
-
-    그래서 기존에 ViewController에서 접근하여 설정했던 값들을 PopOverViewController에서 설정하여 View들에게 접근제한자를 설정해줄 수 있게 해주었습니다.
-
-- 기존에 PopOverViewController가 화면에 보여지지 않을 CollectionView를 소유하고 있었는데 이를 PopOverViewController에 Protocol을 생성해주면서 Delegate 패턴을 사용하여 해결해 주었습니다. 
-
-  - ```swift
-    //PopOverViewController.swift
-    protocol PopOverViewDelegate: AnyObject {
-        func addThingToDataSource(_ popOverViewController: PopOverViewController, thing: Thing)
-        func editThingToDataSource(_ popOverViewController: PopOverViewController, thing: Thing)
-    }
-    
-    //ViewController.swift
-    extension ViewController: PopOverViewDelegate {
-        func addThingToDataSource(_ popOverViewController: PopOverViewController, thing: Thing) {
-            todoCollectionView.insertDataSource(thing: thing, state: .todo)
-        }
-        
-        func editThingToDataSource(_ popOverViewController: PopOverViewController, thing: Thing) {
-            guard let state = thing.state else { return }
-            switch state {
-            case .todo:
-                todoCollectionView.updateThing(thing: thing)
-            case .doing:
-                doingCollectionView.updateThing(thing: thing)
-            case .done:
-                doneCollectionView.updateThing(thing: thing)
-            }
-        }
-    }
-    ```
-
-    그래서 더이상 PopOverViewController가 불필요하게 CollectionView를 들고다니지 않을 수 있게 리팩토링 해주었습니다.
-
-
-
-## 문제점
-
-- CollectionView Drag and Drop 기능 구현 중 하나의 CollectionView에 있는 cell을 다른 CollectionView로 이동하려고 할 때 이전의 cell은 지워지지 않고 그대로 남아있는 현상.
-
-  - 원인 : Diffable DataSource에서 Delete를 진행하는 과정에서 DataSource에서 해당 데이터를 찾지 못함.
-
-  - 해결 방법 : 기존의 struct로 생성되어있던 Thing 모델을 class로 바꾸는 과정에서 Diffable DataSource에서 필요로 하는 Hashable 과 Equatable에 대한 정의를 해주지 않았음. 
-
-  - ```swift
-        //Thing.swift
-            override var hash: Int {
-            var hasher = Hasher()
-            hasher.combine(id)
-            return hasher.finalize()
-        }
-        
-        override func isEqual(_ object: Any?) -> Bool {
-            guard let object = object as? Thing else { return false }
-            return self.id == object.id
-        }
-    ```
-
-    object에 대한 hash값과 isEqual을 정의해주며 id값을 비교하여 Diffable DataSource에서 데이터를 찾을 수 있게 해주었다.
-
-- ```swift
-      init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout, collectionType: State) {
-          super.init(frame: frame, collectionViewLayout: layout)
-          self.collectionType = collectionType
-          things = DataSource.shared.getDataByState(state: collectionType)
-          configureCollectionView()
-          configureDataSource()
-          configureSnapshot()
-      }
-      
-      required init?(coder: NSCoder) {
-          super.init(coder: coder)
-          preconditionFailure("모르겠어요.")
-          self.collectionType = collectionType	//Error!
-          things = DataSource.shared.getDataByState(state: collectionType)
-          configureCollectionView()
-          configureDataSource()
-          configureSnapshot()
-      }
-  ```
-
-  Required init? 과 init의 구현을 똑같이 해주려고 하는데 기존의 init은 collectionType이라는 파라미터를 하나 더 받아온다. 하지만 required init?에 collectionType이라는 파라미터를 넣으면 required init?을 또 생성하라는 에러메시지가 나오는 문제 
-
+## 💡 어떻게 구현할까? 💡
+### 
