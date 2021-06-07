@@ -30,6 +30,7 @@
   - Style: 동작에 영향없는 코드변경, 이름변경
   - Docs: 문서수정
   - Chore: 기타
+
 - 코딩 컨벤션
   - Swift API 디자인 가이드라인을 준수하기
   - naming에 신경쓰기.
@@ -38,8 +39,10 @@
 ---
  
 ## 📱 앱 동작화면 📱
- 
- 
+<img src = "https://user-images.githubusercontent.com/50835836/120988672-bedd8d80-c7b9-11eb-8480-900497ef0d5a.gif" alt = "InAppDrag" width = "600" height = "450">
+<img src = "https://user-images.githubusercontent.com/50835836/120988245-58f10600-c7b9-11eb-9f74-21c43a731cd7.gif" alt = "InAppDelete" width = "600" height = "450">
+<img src = "https://user-images.githubusercontent.com/50835836/120988336-6efec680-c7b9-11eb-9c8f-92dd801b5946.gif" alt = "InAppCreate" width = "600" height = "450">
+
 ---
 
 ## 👨🏻‍💻 구현 내용 👨🏻‍💻
