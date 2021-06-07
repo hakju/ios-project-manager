@@ -40,15 +40,21 @@
  
 ## 📱 앱 동작화면 📱
 <img src = "https://user-images.githubusercontent.com/50835836/120988672-bedd8d80-c7b9-11eb-8480-900497ef0d5a.gif" alt = "InAppDrag" width = "600" height = "450">
+<img src = "https://user-images.githubusercontent.com/50835836/120991929-0f0a1f00-c7bd-11eb-9375-6e7f44fcb2dc.gif" alt = "InAppEdit" width = "600" height = "450">
 <img src = "https://user-images.githubusercontent.com/50835836/120988245-58f10600-c7b9-11eb-9f74-21c43a731cd7.gif" alt = "InAppDelete" width = "600" height = "450">
 <img src = "https://user-images.githubusercontent.com/50835836/120988336-6efec680-c7b9-11eb-9c8f-92dd801b5946.gif" alt = "InAppCreate" width = "600" height = "450">
 
 ---
 
 ## 👨🏻‍💻 구현 내용 👨🏻‍💻
-- 
+- 할 일을 스와이프하여 삭제가능하게 하였다.
+- 기한 날짜가 과거의 날짜면 빨간색으로 표시하게 하였다.
+- 할 일을 터치하면 상세보기로 전환하고 수정버튼을 누르기 전까지 수정되지 않는다.
+- 수정 버튼을 누르면 할 일을 수정가능하게 하였다.
+- 할 일을 드래그하여 다른 영역으로 이동가능하게 하였다.
 
 ---
 
 ## 💡 어떻게 구현할까? 💡
-### 
+### UI
+- Project Manager는 칸반보드 형식이며 아이패드 전용 앱이다. 처음 UI를 구현하고자 할때 TableView와 CollectionView 둘 중 무엇으로 구현할 지, 고민이 앞섰다.
