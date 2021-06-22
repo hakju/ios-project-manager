@@ -58,3 +58,37 @@
 ## 💡 어떻게 구현할까? 💡
 ### UI
 - Project Manager는 칸반보드 형식이며 아이패드 전용 앱이다. 처음 UI를 구현하고자 할때 TableView와 CollectionView 둘 중 무엇으로 구현할 지, 고민이 앞섰다.
+  - #### TableView vs CollectionView
+  |  | 장점 | 단점 |
+  | :---- | ---- | ---- |
+  | **TableView** | 익숙하게 사용할 수 있다. | 수평 스크롤이 불가하다. |
+  | **CollectionView** | 수직, 수평 스크롤이 가능하다. | 사용한 경험이 없어서 미숙하다. | 
+  - 우리는 **신기술을 두려워하지 않고 적용해보고자** 한번도 사용해보지 않은 CollectionView를 사용하기로 하였다.
+  - (CollectionView로 TableView의 모든 부분을 수용할 수 있는데 TableView를 사용해야하는 이유가 무엇일까?)
+  - 추가로 경험해보지 못한 **DiffableDataSource를** 사용해보기로 하였다.
+
+- Drag 기능
+  - 할 일을 일정에 맞추어 현재 상태에 맞는 영역으로 드래그할 수 있게 하였다.
+  - <img src = "https://user-images.githubusercontent.com/50835836/120988672-bedd8d80-c7b9-11eb-8480-900497ef0d5a.gif" alt = "InAppDrag" width = "600" height = "450">
+  ``` swift 
+  // ListCollectionView.swift
+  func deleteDataSource(thing: Thing) {
+    var snapshot = diffableDataSource.snapshot()
+    snapshot.deleteItems([thing])
+    diffableDataSource.apply(snapshot, animatingDifferences: true)
+  }
+  
+  // UIHelper.swift
+  var listConfigration = UICollectionLayoutListConfiguration(appearance: .plain)
+  listConfigration.trailingSwipeActionsConfigurationProvider = { indexPath in
+    guard let thing = collectionView.diffableDataSource.itemIdentifier(for: indexPath) else {
+      return nil
+    }
+    let actionHandler: UIContextualAction.Handler = { action, view, completion in
+      collectionView.deleteDataSource(thing: thing)
+    }
+    let action = UIContextualAction(style: .destructive, title: "Delete", handler: actionHandler)
+    return UISwipeActionsConfiguration(actions: [action])
+  }
+  let layout = UICollectionViewCompositionalLayout.list(using: listConfigration)
+  ```
