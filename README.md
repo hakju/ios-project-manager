@@ -47,6 +47,7 @@
 ---
 
 ## 👨🏻‍💻 구현 내용 👨🏻‍💻
+- API 문서를 기준으로 할 일에 대한 모델을 정의하였다.
 - 할 일을 스와이프하여 삭제가능하게 하였다.
 - 기한 날짜가 과거의 날짜면 빨간색으로 표시하게 하였다.
 - 할 일을 터치하면 상세보기로 전환하고 수정버튼을 누르기 전까지 수정되지 않는다.
@@ -67,10 +68,92 @@
   - (CollectionView로 TableView의 모든 부분을 수용할 수 있는데 TableView를 사용해야하는 이유가 무엇일까?)
   - 추가로 경험해보지 못한 **DiffableDataSource를** 사용해보기로 하였다.
 
-- Drag 기능
-  - 할 일을 일정에 맞추어 현재 상태에 맞는 영역으로 드래그할 수 있게 하였다.
+- Create 기능
+  - 할 일을 추가할 수 있게 하였다.
+  - modal 방식으로 view를 보여주며 할 일의 제목, 기한, 상세 내용을 입력할 수 있다.
+  - <img src = "https://user-images.githubusercontent.com/50835836/120988336-6efec680-c7b9-11eb-9c8f-92dd801b5946.gif" alt = "InAppCreate" width = "600" height = "450">
+  ``` swift
+  
+  ```
+
+- Drag & Drop 기능
+  - 할 일을 드래그하여 현재 상태에 맞는 영역으로 드롭할 수 있게 하였다.
   - <img src = "https://user-images.githubusercontent.com/50835836/120988672-bedd8d80-c7b9-11eb-8480-900497ef0d5a.gif" alt = "InAppDrag" width = "600" height = "450">
   ``` swift 
+  //MARK: - UICollectionViewDragDelegate -
+  extension ViewController: UICollectionViewDragDelegate {
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+      guard let collectionView = collectionView as? ListCollectionView,
+            let thing = collectionView.diffableDataSource.itemIdentifier(for: indexPath) else {
+        return []
+      }
+        
+      let itemProvider = NSItemProvider(object: thing)
+      let dragItem = UIDragItem(itemProvider: itemProvider)
+        
+      return [dragItem]
+    }
+  }
+
+  //MARK: - UICollectionViewDropDelegate -
+  extension ViewController: UICollectionViewDropDelegate {
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+    var dropProposal = UICollectionViewDropProposal(operation: .cancel)
+    guard session.items.count == 1 else {
+      return dropProposal
+    }
+    if collectionView.hasActiveDrag {
+      dropProposal = UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+    } else {
+      dropProposal = UICollectionViewDropProposal(operation: .copy, intent: .insertAtDestinationIndexPath)
+    }
+    return dropProposal
+  }
+    
+  func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+    guard let collectionView = collectionView as? ListCollectionView else {
+      return
+    }
+        
+    let destinationIndexPath: IndexPath
+        
+    if let indexPath = coordinator.destinationIndexPath {
+      destinationIndexPath = indexPath
+    } else {
+      let section = collectionView.numberOfSections - 1
+      let row = collectionView.numberOfItems(inSection: section)
+      destinationIndexPath = IndexPath(row: row, section: section)
+    }
+        
+    coordinator.session.loadObjects(ofClass: Thing.self) { [weak self] (items) in
+      guard let self = self else { return }
+      guard let thingItem = items as? [Thing],
+            let thing = thingItem.first else { return }
+      let state = collectionView.collectionType
+            
+      self.deleteFromBefore(thing: thing)
+      thing.state = state
+      collectionView.reorderDataSource(destinationIndexPath: destinationIndexPath, thing: thing)
+      }
+    }
+  }
+  ```
+  
+- Edit 기능
+  - 할 일을 선택하면 제목, 기한, 상세 내용을 보여주는 view를 modal 방식으로 보여준다.
+  - edit 버튼을 클릭 시 제목, 기한, 상세 내용을 수정할 수 있게 하였다.
+  - <img src = "https://user-images.githubusercontent.com/50835836/120991929-0f0a1f00-c7bd-11eb-9375-6e7f44fcb2dc.gif" alt = "InAppEdit" width = "600" height = "450">
+  ``` swift
+  
+  ```
+  
+  - collectionView를 들고 다니는 문제가 있었다.
+  
+- Delete 기능
+  - 할 일을 스와이프하면 삭제할 수 있게 하였다.
+  - 1번 스와이프시, 삭제 버튼이 생기고 버튼을 클릭하거나 1번 더 스와이프하게되면 삭제가 된다.
+  - <img src = "https://user-images.githubusercontent.com/50835836/120988245-58f10600-c7b9-11eb-9f74-21c43a731cd7.gif" alt = "InAppDelete" width = "600" height = "450">
+  ``` swift
   // ListCollectionView.swift
   func deleteDataSource(thing: Thing) {
     var snapshot = diffableDataSource.snapshot()
@@ -92,3 +175,4 @@
   }
   let layout = UICollectionViewCompositionalLayout.list(using: listConfigration)
   ```
+  
