@@ -73,7 +73,26 @@
   - modal 방식으로 view를 보여주며 할 일의 제목, 기한, 상세 내용을 입력할 수 있다.
   - <img src = "https://user-images.githubusercontent.com/50835836/120988336-6efec680-c7b9-11eb-9c8f-92dd801b5946.gif" alt = "InAppCreate" width = "600" height = "450">
   ``` swift
-  
+  //PopOverViewController.swift
+  @objc private func didTappedAddDoneButton() {
+      let thing = Thing(id: UUID().uuidString, title: textField.text, description: textView.text, state: .todo, dueDate: datePicker.date.timeIntervalSince1970, updatedAt: "\(Date())")
+      self.dismiss(animated: true) {
+          self.delegate?.addThingToDataSource(self, thing: thing)
+      }
+  }
+    
+  @objc private func didTappedCancelButton() {
+      self.dismiss(animated: true, completion: nil)
+  }
+  ```
+
+- 할 일의 기한이 지나면 기한의 글자 색상을 빨간색으로 바꿔주게 하였다.
+  ``` swift
+  //ListCollectionView.swift
+  private func checkIsDatePassed(_ date: Double) -> Bool {
+      let currentDate = Date().timeIntervalSince1970
+      return date < currentDate
+  }
   ```
 
 - Drag & Drop 기능
@@ -144,13 +163,53 @@
   - edit 버튼을 클릭 시 제목, 기한, 상세 내용을 수정할 수 있게 하였다.
   - <img src = "https://user-images.githubusercontent.com/50835836/120991929-0f0a1f00-c7bd-11eb-9375-6e7f44fcb2dc.gif" alt = "InAppEdit" width = "600" height = "450">
   ``` swift
+  //PopOverViewController.swift
+  @objc private func didTappedEditButton() {
+      guard let contentView = self.navigationController?.viewControllers.last as? PopOverViewController else { return }
+      contentView.textField.isUserInteractionEnabled = true
+      contentView.datePicker.isUserInteractionEnabled = true
+      contentView.textView.isUserInteractionEnabled = true
+        
+      contentView.textField.becomeFirstResponder()
+  }
   
+  @objc private func didTappedEditDoneButton() {
+      guard let contentView = self.navigationController?.viewControllers.last as? PopOverViewController else { return }
+      guard let thing = self.thing else {
+          return
+      }
+      self.dismiss(animated: true) {
+          thing.title = contentView.textField.text
+          thing.detail = contentView.textView.text
+          thing.dueDate = contentView.datePicker.date.timeIntervalSince1970
+          self.delegate?.editThingToDataSource(self, thing: thing)
+      }
+  }
+  
+  //ViewController.swift
+  func editThingToDataSource(_ popOverViewController: PopOverViewController, thing: Thing) {
+      guard let state = thing.state else { return }
+      switch state {
+      case .todo:
+          todoCollectionView.updateThing(thing: thing)
+      case .doing:
+          doingCollectionView.updateThing(thing: thing)
+      case .done:
+          doneCollectionView.updateThing(thing: thing)
+      }
+  }
   ```
-  
+
+----  
+----
+----  
 - collectionView를 들고 다니는 문제가 있었다.
   - 기존에 PopOverViewController의 View들을 Private으로 설정해줄 수 없었다. -> ViewController에서 접근하고 있었기때문이다. 그래서 ViewController에서는 PopOverViewController에 사용할 Thing만 넘겨주고, 그 Thing의 유무에 따라 Add를 위한 PopOverViewController인지 Edit를 위한 PopOverViewController인지 결정해주었습니다.
   - 그래서 기존에 ViewController에서 접근하여 설정했던 값들을 PopOverViewController에서 설정하여 View들에게 접근제한자를 설정해줄 수 있게 해주었습니다.
   - 기존에 PopOverViewController가 화면에 보여지지 않을 CollectionView를 소유하고 있었는데 이를 PopOverViewController에 Protocol을 생성해주면서 Delegate 패턴을 사용하여 해결해 주었습니다.
+----
+----  
+----
   
 - Delete 기능
   - 할 일을 스와이프하면 삭제할 수 있게 하였다.
